@@ -1,0 +1,2 @@
+ALTER TABLE `products` ADD `createdAt` timestamp DEFAULT (now()) NOT NULL;--> statement-breakpoint
+ALTER TABLE `products` ADD `updatedAt` timestamp DEFAULT (now()) NOT NULL ON UPDATE CURRENT_TIMESTAMP;

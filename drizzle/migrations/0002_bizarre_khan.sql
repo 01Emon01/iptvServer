@@ -1,0 +1,1 @@
+ALTER TABLE `categories` MODIFY COLUMN `slug` varchar(255) NOT NULL;
