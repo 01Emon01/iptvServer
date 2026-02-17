@@ -127,3 +127,14 @@ export const fetchSubsProduct = async () => {
     },
   });
 };
+
+export const fetchBoxesProduct = async () => {
+  return await db.query.products.findMany({
+    where: (products, { eq }) => eq(products.category, "2GAC37NTXWQTN9"),
+    with: {
+      categories: true,
+      specialsAsSecond: true,
+      specialsAsThird: true,
+    },
+  });
+};

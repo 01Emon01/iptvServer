@@ -4,6 +4,7 @@ import {
   editProduct,
   makeCategory,
   makeProduct,
+  pullBoxesProduct,
   pullCategories,
   pullProductById,
   pullProducts,
@@ -35,6 +36,7 @@ router.route("/products/edit/:id").post(upload.array("images", 5), editProduct);
 
 /* <----- Category Based -----> */
 
+router.route("/products/category/boxes").get(pullBoxesProduct);
 router.route("/products/category/subs").get(pullSubsProduct);
 
 /* <----- Specials -----> */

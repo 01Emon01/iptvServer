@@ -3,6 +3,7 @@ import {
   createCategory,
   createProduct,
   editSpecials,
+  fetchBoxesProduct,
   fetchCategories,
   fetchProductById,
   fetchProducts,
@@ -245,6 +246,19 @@ export const pullSpecials = async (req, res) => {
 export const pullSubsProduct = async (req, res) => {
   try {
     const products = await fetchSubsProduct();
+    return res.status(200).json(products);
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({
+      success: false,
+      message: "Failed to fetch subs products",
+    });
+  }
+};
+
+export const pullBoxesProduct = async (req, res) => {
+  try {
+    const products = await fetchBoxesProduct();
     return res.status(200).json(products);
   } catch (err) {
     console.error(err);
