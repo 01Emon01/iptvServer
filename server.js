@@ -8,6 +8,7 @@ import { fileURLToPath } from "url";
 import { AuthRouter } from "./routes/auth.routes.js";
 import { ProductRouter } from "./routes/products.routes.js";
 import { BannerRouter } from "./routes/banners.routes.js";
+import { GeneralRouter } from "./routes/general.routes.js";
 
 const server = express();
 
@@ -27,6 +28,7 @@ server.use(
 );
 
 server.use(express.urlencoded({ extended: true }));
+server.use("/data/admin", GeneralRouter);
 server.use("/data/admin", AuthRouter);
 server.use("/data/admin", ProductRouter);
 server.use("/data/admin", BannerRouter);

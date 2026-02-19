@@ -64,6 +64,13 @@
       "when": 1771068227862,
       "tag": "0008_familiar_paper_doll",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "5",
+      "when": 1771534068527,
+      "tag": "0009_yielding_sugar_man",
+      "breakpoints": true
     }
   ]
 }

@@ -1,0 +1,1 @@
+ALTER TABLE `settings` MODIFY COLUMN `supportNo` varchar(255) NOT NULL;

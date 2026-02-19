@@ -61,7 +61,7 @@ export const settings = mysqlTable("settings", {
   favicon: varchar("favicon", { length: 255 }).notNull(),
   footerInfo: text("footer_info"),
   supportEmail: varchar("support_email", { length: 150 }),
-  supportNo: int().notNull(),
+  supportNo: varchar({ length: 255 }).notNull(),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow().onUpdateNow(),
 });
