@@ -1,7 +1,11 @@
 import { db } from "../config/db.js";
 import { cleanupUploads } from "../helpers/Cleanup.js";
 import { deleteBannerFile } from "../helpers/DeleteBannerFIle.js";
-import { fetchBanners, handleBanners } from "../services/banners.services.js";
+import {
+  fetchBanners,
+  fetchBannersBySp,
+  handleBanners,
+} from "../services/banners.services.js";
 
 export const manageBanners = async (req, res) => {
   const files = req.files || [];
@@ -14,13 +18,11 @@ export const manageBanners = async (req, res) => {
 
     const finalImages = [...existing.images];
 
-    // ✅ mark deleted/replaced
     deletedImages.forEach((deletedPath) => {
       const index = finalImages.indexOf(deletedPath);
       if (index !== -1) finalImages[index] = null;
     });
 
-    // ✅ replace placeholders
     uploadedPaths.forEach((newPath) => {
       const replaceIndex = finalImages.indexOf(null);
 
@@ -76,10 +78,22 @@ export const pullBanners = async (req, res) => {
     const banners = await fetchBanners();
     return res.status(200).json(banners);
   } catch (err) {
-    console.log(err);
     return res.status(500).json({
       success: false,
       message: "Failed to fetch banners",
+    });
+  }
+};
+
+export const pullBannerBySpecials = async (req, res) => {
+  try {
+    const banners = await fetchBannersBySp();
+    return res.status(200).json(banners);
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json({
+      success: false,
+      message: "Failed to fetch banners with specials",
     });
   }
 };

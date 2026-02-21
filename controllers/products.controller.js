@@ -2,6 +2,8 @@ import path from "path";
 import {
   createCategory,
   createProduct,
+  dropCategory,
+  dropProduct,
   editSpecials,
   fetchBoxesProduct,
   fetchCategories,
@@ -42,6 +44,23 @@ export const pullCategories = async (req, res) => {
   try {
     const categories = await fetchCategories();
     return res.status(200).json(categories);
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json({
+      success: false,
+      message: "Failed to fetch categories",
+    });
+  }
+};
+
+export const deleteCategory = async (req, res) => {
+  try {
+    const { id } = req.params;
+    await dropCategory(id);
+    return res.status(200).json({
+      success: true,
+      message: "Category deleted successfully!",
+    });
   } catch (err) {
     console.log(err);
     return res.status(500).json({
@@ -265,6 +284,41 @@ export const pullBoxesProduct = async (req, res) => {
     return res.status(500).json({
       success: false,
       message: "Failed to fetch subs products",
+    });
+  }
+};
+
+export const deleteProduct = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const product = await fetchProductById(id);
+    if (!product) {
+      return res.status(404).json({
+        success: false,
+        message: "Product not found",
+      });
+    }
+    if (product.images?.length) {
+      for (const img of product.images) {
+        try {
+          const normalized = img.replace(/\\/g, "/");
+          const filePath = path.join(process.cwd(), normalized);
+          await fs.promises.unlink(filePath);
+        } catch (err) {
+          console.warn("Image delete failed:", img);
+        }
+      }
+    }
+    await dropProduct(id);
+    return res.status(200).json({
+      success: true,
+      message: "Product deleted successfully!",
+    });
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json({
+      success: false,
+      message: "Failed to delete product",
     });
   }
 };

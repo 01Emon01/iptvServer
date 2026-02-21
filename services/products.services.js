@@ -24,6 +24,10 @@ export const fetchCategories = async () => {
   return rows;
 };
 
+export const dropCategory = async (id) => {
+  return await db.delete(categories).where(eq(categories.id, id));
+};
+
 export const createProduct = async (data) => {
   await db.insert(products).values({
     id: generateId(),
@@ -98,13 +102,15 @@ export const updateProduct = async (id, data) => {
 };
 
 export const editSpecials = async ({ fstPrd, secPrd, thirdPrd, frthPrd }) => {
-  return await db.insert(specials).values({
-    id: generateId(),
-    fstPrd,
-    secPrd,
-    thirdPrd,
-    frthPrd,
-  });
+  return await db
+    .update(specials)
+    .set({
+      fstPrd,
+      secPrd,
+      thirdPrd,
+      frthPrd,
+    })
+    .where(eq(specials.id, "VKI9JKIMCQVYO7"));
 };
 
 export const fetchSpecials = async () => {
@@ -120,7 +126,7 @@ export const fetchSpecials = async () => {
 
 export const fetchSubsProduct = async () => {
   return await db.query.products.findMany({
-    where: (products, { eq }) => eq(products.category, "F53VQFCOIDM6SU"),
+    where: (products, { eq }) => eq(products.category, "R4ZUUKL1BBEZMF"),
     with: {
       categories: true,
       specialsAsFourth: true,
@@ -137,4 +143,8 @@ export const fetchBoxesProduct = async () => {
       specialsAsThird: true,
     },
   });
+};
+
+export const dropProduct = async (id) => {
+  return await db.delete(products).where(eq(products.id, id));
 };

@@ -27,7 +27,7 @@ export const products = mysqlTable("products", {
   shortDesc: text().notNull(),
   desc: text().notNull(),
   price: decimal({ precision: 10, scale: 2 }).notNull(),
-  discount: decimal({ precision: 10, scale: 2 }).notNull(),
+  discount: decimal({ precision: 10, scale: 2 }),
   stock: int().notNull(),
   sales: int().notNull(),
   createdAt: timestamp().defaultNow().notNull(),
@@ -78,6 +78,15 @@ export const admins = mysqlTable("admins", {
 export const banners = mysqlTable("banners", {
   id: varchar({ length: 14 }).primaryKey(),
   images: json("images").default([]).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+});
+
+export const contacts = mysqlTable("contacts", {
+  id: varchar({ length: 14 }).primaryKey(),
+  name: varchar({ length: 255 }).notNull(),
+  email: varchar({ length: 255 }).notNull(),
+  message: text().notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
 });

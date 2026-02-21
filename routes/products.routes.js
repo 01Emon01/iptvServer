@@ -1,6 +1,8 @@
 import { Router } from "express";
 import {
   changeSpecials,
+  deleteCategory,
+  deleteProduct,
   editProduct,
   makeCategory,
   makeProduct,
@@ -28,11 +30,13 @@ const upload = multer({ storage });
 
 router.route("/categories").get(pullCategories);
 router.route("/categories/create").post(makeCategory);
+router.route("/category/delete/:id").delete(deleteCategory);
 
 router.route("/products").get(pullProducts);
 router.route("/products/:id").get(pullProductById);
 router.route("/products/create").post(upload.array("images", 5), makeProduct);
 router.route("/products/edit/:id").post(upload.array("images", 5), editProduct);
+router.route("/products/delete/:id").delete(deleteProduct);
 
 /* <----- Category Based -----> */
 

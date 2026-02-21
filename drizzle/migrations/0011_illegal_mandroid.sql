@@ -1,0 +1,1 @@
+ALTER TABLE `products` MODIFY COLUMN `discount` decimal(10,2);
