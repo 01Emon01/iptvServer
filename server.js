@@ -20,19 +20,19 @@ server.use("/data/files", express.static(path.join(__dirname, "uploads")));
 server.use(cookieParser());
 server.use(express.json());
 
-server.use(
-  cors({
-    origin: ["http://localhost:3000", "http://localhost:3001"],
-    credentials: true,
-  }),
-);
-
 // server.use(
 //   cors({
-//     origin: ["https://uaeiptvbox.net"],
+//     origin: ["http://localhost:3000", "http://localhost:3001"],
 //     credentials: true,
 //   }),
 // );
+
+server.use(
+  cors({
+    origin: ["https://uaeiptvbox.net", "https://admin.uaeiptvbox.net"],
+    credentials: true,
+  }),
+);
 
 server.use(express.urlencoded({ extended: true }));
 
