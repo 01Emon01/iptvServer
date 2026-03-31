@@ -27,7 +27,23 @@ server.use(
   }),
 );
 
+// server.use(
+//   cors({
+//     origin: ["https://uaeiptvbox.net"],
+//     credentials: true,
+//   }),
+// );
+
 server.use(express.urlencoded({ extended: true }));
+
+server.get("/", (req, res) => {
+  res.send(`
+    <body style="background:black; color:white; font-family:monospace;">
+      Node JS v24
+    </body>
+  `);
+});
+
 server.use("/data/admin", GeneralRouter);
 server.use("/data/admin", AuthRouter);
 server.use("/data/admin", ProductRouter);

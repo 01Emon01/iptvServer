@@ -2,6 +2,7 @@ import { and, eq, like } from "drizzle-orm";
 import { db } from "../config/db.js";
 import { categories, products, specials } from "../drizzle/schema.js";
 import { generateId } from "../helpers/generateID.js";
+import { alias } from "drizzle-orm/mysql-core";
 
 export const findCateBySlug = async (slug) => {
   const [category] = await db
@@ -24,6 +25,21 @@ export const fetchCategories = async () => {
   return rows;
 };
 
+export const fetchCategoryById = async (id) => {
+  const [row] = await db.select().from(categories).where(eq(categories.id, id));
+  return row;
+};
+
+export const changeCategory = async (id, data) => {
+  await db
+    .update(categories)
+    .set({
+      name: data.name,
+      slug: data.slug,
+    })
+    .where(eq(categories.id, id));
+};
+
 export const dropCategory = async (id) => {
   return await db.delete(categories).where(eq(categories.id, id));
 };
@@ -44,14 +60,9 @@ export const createProduct = async (data) => {
 };
 
 export const fetchProducts = async (categorySlug, name) => {
-  if (!categorySlug && !name) {
-    return await db.query.products.findMany({
-      with: { categories: true },
-    });
-  }
-
   let filters = [];
 
+  // Filter by category slug
   if (categorySlug) {
     const categoryRow = await db.query.categories.findFirst({
       where: (categories, { eq }) => eq(categories.slug, categorySlug),
@@ -62,26 +73,45 @@ export const fetchProducts = async (categorySlug, name) => {
     filters.push(eq(products.category, categoryRow.id));
   }
 
+  // Filter by product name
   if (name) {
     filters.push(like(products.name, `%${name}%`));
   }
 
-  return await db.query.products.findMany({
-    where: filters.length ? and(...filters) : undefined,
-    with: {
-      categories: true,
-    },
-  });
+  // Build query
+  const query = db
+    .select({
+      product: products,
+      category: categories,
+    })
+    .from(products)
+    .leftJoin(categories, eq(products.category, categories.id))
+    .where(filters.length ? and(...filters) : undefined);
+
+  const result = await query;
+
+  return result;
 };
 
 export const fetchProductById = async (id) => {
-  const product = await db.query.products.findFirst({
-    where: (products, { eq }) => eq(products.id, id),
-    with: {
-      categories: true,
-    },
-  });
-  return product;
+  const result = await db
+    .select({
+      product: products,
+      category: categories,
+    })
+    .from(products)
+    .leftJoin(categories, eq(products.category, categories.id))
+    .where(eq(products.id, id))
+    .limit(1);
+
+  if (!result.length) return null;
+
+  const row = result[0];
+
+  return {
+    ...row.product,
+    category: row.category,
+  };
 };
 
 export const updateProduct = async (id, data) => {
@@ -114,35 +144,86 @@ export const editSpecials = async ({ fstPrd, secPrd, thirdPrd, frthPrd }) => {
 };
 
 export const fetchSpecials = async () => {
-  return await db.query.specials.findFirst({
-    with: {
-      firstProduct: true,
-      secondProduct: true,
-      thirdProduct: true,
-      fourthProduct: true,
-    },
-  });
+  // Aliases for products
+  const firstProduct = alias(products, "firstProduct");
+  const secondProduct = alias(products, "secondProduct");
+  const thirdProduct = alias(products, "thirdProduct");
+  const fourthProduct = alias(products, "fourthProduct");
+
+  const result = await db
+    .select({
+      special: specials,
+      firstProduct,
+      secondProduct,
+      thirdProduct,
+      fourthProduct,
+    })
+    .from(specials)
+    // ✅ FIXED JOIN KEYS
+    .leftJoin(firstProduct, eq(specials.fstPrd, firstProduct.id))
+    .leftJoin(secondProduct, eq(specials.secPrd, secondProduct.id))
+    .leftJoin(thirdProduct, eq(specials.thirdPrd, thirdProduct.id))
+    .leftJoin(fourthProduct, eq(specials.frthPrd, fourthProduct.id))
+    .limit(1);
+
+  if (!result.length) return null;
+
+  const row = result[0];
+
+  return {
+    ...row.special,
+    firstProduct: row.firstProduct,
+    secondProduct: row.secondProduct,
+    thirdProduct: row.thirdProduct,
+    fourthProduct: row.fourthProduct,
+  };
 };
 
 export const fetchSubsProduct = async () => {
-  return await db.query.products.findMany({
-    where: (products, { eq }) => eq(products.category, "R4ZUUKL1BBEZMF"),
-    with: {
-      categories: true,
-      specialsAsFourth: true,
-    },
-  });
+  const result = await db
+    .select({
+      product: products,
+      category: categories,
+      special: specials, // represents specialsAsFourth
+    })
+    .from(products)
+    .leftJoin(categories, eq(products.category, categories.id))
+    // ✅ FIXED HERE
+    .leftJoin(specials, eq(specials.frthPrd, products.id))
+    .where(eq(products.category, "R4ZUUKL1BBEZMF"));
+
+  return result.map((row) => ({
+    ...row.product,
+    category: row.category,
+    specialsAsFourth: row.special,
+  }));
 };
 
 export const fetchBoxesProduct = async () => {
-  return await db.query.products.findMany({
-    where: (products, { eq }) => eq(products.category, "2GAC37NTXWQTN9"),
-    with: {
-      categories: true,
-      specialsAsSecond: true,
-      specialsAsThird: true,
-    },
-  });
+  // Alias specials table twice
+  const specialsSecond = alias(specials, "specialsSecond");
+  const specialsThird = alias(specials, "specialsThird");
+
+  const result = await db
+    .select({
+      product: products,
+      category: categories,
+      specialsSecond,
+      specialsThird,
+    })
+    .from(products)
+    .leftJoin(categories, eq(products.category, categories.id))
+    // ✅ FIXED HERE
+    .leftJoin(specialsSecond, eq(specialsSecond.secPrd, products.id))
+    .leftJoin(specialsThird, eq(specialsThird.thirdPrd, products.id))
+    .where(eq(products.category, "2GAC37NTXWQTN9"));
+
+  return result.map((row) => ({
+    ...row.product,
+    category: row.category,
+    specialsAsSecond: row.specialsSecond,
+    specialsAsThird: row.specialsThird,
+  }));
 };
 
 export const dropProduct = async (id) => {

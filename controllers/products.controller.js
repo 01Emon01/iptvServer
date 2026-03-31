@@ -1,5 +1,6 @@
 import path from "path";
 import {
+  changeCategory,
   createCategory,
   createProduct,
   dropCategory,
@@ -7,6 +8,7 @@ import {
   editSpecials,
   fetchBoxesProduct,
   fetchCategories,
+  fetchCategoryById,
   fetchProductById,
   fetchProducts,
   fetchSpecials,
@@ -45,10 +47,39 @@ export const pullCategories = async (req, res) => {
     const categories = await fetchCategories();
     return res.status(200).json(categories);
   } catch (err) {
-    console.log(err);
     return res.status(500).json({
       success: false,
       message: "Failed to fetch categories",
+    });
+  }
+};
+
+export const pullCategoryById = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const category = await fetchCategoryById(id);
+    return res.status(200).json(category);
+  } catch (err) {
+    return res.status(500).json({
+      success: false,
+      message: "Failed to fetch category",
+    });
+  }
+};
+
+export const editCategory = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const data = req.body;
+    await changeCategory(id, data);
+    return res.status(200).json({
+      success: true,
+      message: "Category edited successfully!",
+    });
+  } catch (err) {
+    return res.status(500).json({
+      success: false,
+      message: "Failed to edit category",
     });
   }
 };
@@ -62,10 +93,9 @@ export const deleteCategory = async (req, res) => {
       message: "Category deleted successfully!",
     });
   } catch (err) {
-    console.log(err);
     return res.status(500).json({
       success: false,
-      message: "Failed to fetch categories",
+      message: "Failed to delete category",
     });
   }
 };
@@ -94,7 +124,6 @@ export const makeProduct = async (req, res) => {
       message: "Product created successfully!",
     });
   } catch (err) {
-    console.log(err);
     if (files && files.length > 0) {
       await Promise.all(
         files.map((file) => fs.promises.unlink(file.path).catch(() => null)),
@@ -113,7 +142,6 @@ export const pullProducts = async (req, res) => {
     const products = await fetchProducts(c, n);
     return res.status(200).json(products);
   } catch (err) {
-    console.log(err);
     return res.status(500).json({
       success: false,
       message: "Failed to fetch product",
@@ -136,7 +164,6 @@ export const pullProductById = async (req, res) => {
 
     return res.json(product);
   } catch (err) {
-    console.error(err);
     return res.status(500).json({
       success: false,
       message: "Failed to fetch product",
@@ -212,14 +239,11 @@ export const editProduct = async (req, res) => {
       message: "Product updated successfully",
     });
   } catch (err) {
-    console.error("Edit product failed:", err);
-
     if (files.length > 0) {
       await Promise.all(
         files.map((file) => fs.promises.unlink(file.path).catch(() => null)),
       );
     }
-
     return res.status(500).json({
       success: false,
       message: "Failed to edit product",
@@ -254,7 +278,6 @@ export const pullSpecials = async (req, res) => {
     const products = await fetchSpecials();
     return res.status(200).json(products);
   } catch (err) {
-    console.log(err);
     return res.status(500).json({
       success: false,
       message: "failed to fetch specials",
@@ -267,7 +290,6 @@ export const pullSubsProduct = async (req, res) => {
     const products = await fetchSubsProduct();
     return res.status(200).json(products);
   } catch (err) {
-    console.error(err);
     return res.status(500).json({
       success: false,
       message: "Failed to fetch subs products",
@@ -280,7 +302,6 @@ export const pullBoxesProduct = async (req, res) => {
     const products = await fetchBoxesProduct();
     return res.status(200).json(products);
   } catch (err) {
-    console.error(err);
     return res.status(500).json({
       success: false,
       message: "Failed to fetch subs products",
@@ -315,7 +336,6 @@ export const deleteProduct = async (req, res) => {
       message: "Product deleted successfully!",
     });
   } catch (err) {
-    console.log(err);
     return res.status(500).json({
       success: false,
       message: "Failed to delete product",

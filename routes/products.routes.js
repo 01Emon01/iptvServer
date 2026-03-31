@@ -3,11 +3,13 @@ import {
   changeSpecials,
   deleteCategory,
   deleteProduct,
+  editCategory,
   editProduct,
   makeCategory,
   makeProduct,
   pullBoxesProduct,
   pullCategories,
+  pullCategoryById,
   pullProductById,
   pullProducts,
   pullSpecials,
@@ -29,7 +31,9 @@ const storage = multer.diskStorage({
 const upload = multer({ storage });
 
 router.route("/categories").get(pullCategories);
+router.route("/category/:id").get(pullCategoryById);
 router.route("/categories/create").post(makeCategory);
+router.route("/category/edit/:id").post(editCategory);
 router.route("/category/delete/:id").delete(deleteCategory);
 
 router.route("/products").get(pullProducts);

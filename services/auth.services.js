@@ -1,7 +1,7 @@
 import { eq } from "drizzle-orm";
 import { db } from "../config/db.js";
 import { admins } from "../drizzle/schema.js";
-import argon2 from "argon2";
+import bcrypt from "bcryptjs";
 
 export const getAdmin = async (username) => {
   const [admin] = await db
@@ -17,9 +17,9 @@ export const getAdminById = async (id) => {
 };
 
 export const hashPass = async (password) => {
-  return await argon2.hash(password);
+  return await bcrypt.hash(password, 12);
 };
 
 export const comparePass = async (password, hashed) => {
-  return await argon2.verify(hashed, password);
+  return await bcrypt.compare(password, hashed);
 };

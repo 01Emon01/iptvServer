@@ -13,7 +13,7 @@ export const pullSettings = async (req, res) => {
     return res.status(200).json(settings);
   } catch (err) {
     return res.status(500).json({
-      success: false,
+      success: err.message,
       message: "failed to fetch settings",
     });
   }
@@ -38,8 +38,9 @@ export const editSettings = async (req, res) => {
 export const uploadContact = async (req, res) => {
   try {
     const body = req.body;
+    console.log(body);
     await writeContact(body);
-    return res.status(500).json({
+    return res.status(200).json({
       success: true,
       message: "Message submitted successfully!",
     });
@@ -54,7 +55,7 @@ export const uploadContact = async (req, res) => {
 export const pullContacts = async (req, res) => {
   try {
     const contacts = await fetchContacts();
-    return res.status(500).json(contacts);
+    return res.status(200).json(contacts);
   } catch (err) {
     return res.status(500).json({
       success: false,
