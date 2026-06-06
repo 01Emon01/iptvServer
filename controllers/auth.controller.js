@@ -29,6 +29,8 @@ export const adminLogin = async (req, res) => {
       httpOnly: true,
       secure: true,
       sameSite: "none",
+      domain: ".uaeiptvbox.net",
+      path: "/",
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
     return res.status(200).json({
